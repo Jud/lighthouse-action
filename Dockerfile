@@ -14,7 +14,7 @@ LABEL maintainer="Jake Jarvis <jake@jarv.is>"
 # Download latest Lighthouse build from npm
 # Cache bust to ensure latest version when building the image
 ARG CACHEBUST=1
-RUN npm install -g lighthouse puppeteer
+RUN PUPPETEER_SKIP_DOWNLOAD=1 npm install -g lighthouse puppeteer
 
 # Disable Lighthouse error reporting to prevent prompt
 ENV CI=true
