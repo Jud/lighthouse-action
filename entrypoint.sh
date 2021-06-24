@@ -36,16 +36,23 @@ SCORE_PWA=$(jq '.categories["pwa"].score' "$OUTPUT_PATH".report.json)
 
 # Print scores to standard output (0 to 100 instead of 0 to 1).
 # Using hacky bc b/c bash hates floating point arithmetic...
-printf "\n* Completed audit of %s ! Scores are printed below:\n\n" "$REPORT_URL"
-printf "+-------------------------------+\n"
-printf "|  Performance:           %.0f\t|\n" "$(echo "$SCORE_PERFORMANCE*100" | bc -l)"
+printf -v RUN_OUTPUT '\n* Completed audit of %s ! Scores are printed below:\n\n' "$REPORT_URL"
+printf -v RUN_OUTPUT '%s+-------------------------------+\n' "$RUN_OUTPUT"
+printf -v RUN_OUTPUT '%s|  Performance:           %.0f\t|\n' "$RUN_OUTPUT" "$(echo "$SCORE_PERFORMANCE*100" | bc -l)"
 #printf "|  Accessibility:         %.0f\t|\n" "$(echo "$SCORE_ACCESSIBILITY*100" | bc -l)"
 #printf "|  Best Practices:        %.0f\t|\n" "$(echo "$SCORE_PRACTICES*100" | bc -l)"
 #printf "|  SEO:                   %.0f\t|\n" "$(echo "$SCORE_SEO*100" | bc -l)"
 #printf "|  Progressive Web App:   %.0f\t|\n" "$(echo "$SCORE_PWA*100" | bc -l)"
-printf "+-------------------------------+\n\n"
+printf -v RUN_OUTPUT '%s+-------------------------------+\n\n' "$RUN_OUTPUT"
+echo "$RUN_OUTPUT"
+
 printf "* Detailed results are saved here, use https://github.com/actions/upload-artifact to retrieve them:\n"
 printf "    %s\n" "$OUTPUT_PATH.report.html"
-printf "    %s\n" "$OUTPUT_PATH.report.json"
+printf "    %s\n\n\n" "$OUTPUT_PATH.report.json"
+
+RUN_OUTPUT="${RUN_OUTPUT//'%'/'%25'}"
+RUN_OUTPUT="${RUN_OUTPUT//$'\n'/'%0A'}"
+RUN_OUTPUT="${RUN_OUTPUT//$'\r'/'%0D'}"
+echo "::set-output name=content::$RUN_OUTPUT"
 
 exit 0
