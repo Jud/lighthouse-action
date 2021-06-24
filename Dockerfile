@@ -17,6 +17,7 @@ ARG CACHEBUST=1
 RUN npm install -g lighthouse
 
 # Disable Lighthouse error reporting to prevent prompt
+
 ENV CI=true
 
 ADD entrypoint.sh /entrypoint.sh
