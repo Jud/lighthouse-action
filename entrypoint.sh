@@ -21,13 +21,13 @@ OUTPUT_PATH="$GITHUB_WORKSPACE/$OUTPUT_FOLDER/$OUTPUT_FILENAME"
 mkdir -p "$OUTPUT_FOLDER"
 
 # Set the auth cookie param if passed
-[ -z "${AUTH_COOKIE+x}" ] || AUTH_COOKIE=--extra-headers=\"{\"cookie\":\"$AUTH_COOKIE\"}\"
+[ -z "${INPUT_AUTH_COOKIE+x}" ] || INPUT_AUTH_COOKIE=--extra-headers=\"{\"cookie\":\"$INPUT_AUTH_COOKIE\"}\"
 
 # Clarify in logs which URL we're auditing.
 printf "* Beginning audit of %s ...\n\n" "$REPORT_URL"
 
 # Run Lighthouse!
-lighthouse --port=9222 --chrome-flags="--headless --disable-gpu --no-sandbox --no-zygote" $AUTH_COOKIE --output "html" --output "json" --output-path "${OUTPUT_PATH}" "${REPORT_URL}"
+lighthouse --port=9222 --chrome-flags="--headless --disable-gpu --no-sandbox --no-zygote" $INPUT_AUTH_COOKIE --output "html" --output "json" --output-path "${OUTPUT_PATH}" "${REPORT_URL}"
 
 # Parse individual scores from JSON output.
 # Unorthodox jq syntax because of dashes -- https://github.com/stedolan/jq/issues/38
