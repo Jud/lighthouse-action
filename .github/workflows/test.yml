@@ -11,7 +11,7 @@ jobs:
     - name: Run audit on https://github.com/
       uses: ./
       with:
-        netlify_site: 'soundstripe-staging.netlify.app'
+        url: 'https://soundstripe-staging.netlify.app'
         auth_cookie: ${{secrets.NETLIFY_AUTH_COOKIE}}
     - uses: actions/upload-artifact@master
       with:
