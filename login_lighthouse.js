@@ -1,6 +1,7 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const lighthouse = require('lighthouse');
+const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator');
 
 // This port will be used by Lighthouse later. The specific port is arbitrary.
 const PORT = 8041;
@@ -16,7 +17,7 @@ async function login(browser, origin) {
 
   // Fill in and submit login form.
   const passwordInput = await page.$('input[type="password"]');
-  await passwordInput.type('password');
+  await passwordInput.type(process.env.NETLIFY_AUTH);
   await Promise.all([
     page.$eval('form', form => form.submit()),
     page.waitForNavigation(),
@@ -28,10 +29,10 @@ async function login(browser, origin) {
 async function main() {
   // Direct Puppeteer to open Chrome with a specific debugging port.
   const browser = await puppeteer.launch({
-    args: [`--remote-debugging-port=${PORT}`],
+    executablePath: '/usr/bin/google-chrome-stable',
+    args: [`--remote-debugging-port=${PORT}`, '--disable-gpu', '--no-sandbox', '--no-zygote'],
     // Optional, if you want to see the tests in action.
-    headless: false,
-    slowMo: 50,
+    headless: true,
   });
 
   // Setup the browser session to be logged into our site.
@@ -39,13 +40,15 @@ async function main() {
 
   // The local server is running on port 10632.
   const url = process.env.URL;
+
   // Direct Lighthouse to use the same port.
-  const results = await lighthouse(url, {port: PORT, disableStorageReset: true})
-  fs.writeFileSync(process.env.REPORT_PATH, results.report);
+  const results = await lighthouse(url, {onlyCategories: ['performance'], port: PORT, disableStorageReset: true})
+  const html = ReportGenerator.generateReport(results.lhr, 'html');
+  fs.writeFileSync(`${process.env.REPORT_PATH}.report.html`, html);
+  fs.writeFileSync(`${process.env.REPORT_PATH}.report.json`, results.report);
 
   // Direct Puppeteer to close the browser as we're done with it.
   await browser.close();
-
 }
 
 if (require.main === module) {
