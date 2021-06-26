@@ -40,7 +40,7 @@ BUNDLE_SIZE=$(cat "$OUTPUT_PATH".report.json | jq '.audits."network-requests".de
 printf '\n* Completed audit of %s ! Scores are printed below:\n\n' "$REPORT_URL"
 printf -v RUN_OUTPUT '+-------------------------------+\n'
 printf -v RUN_OUTPUT '%s|  Performance:           %.0f\t|\n' "$RUN_OUTPUT" "$(echo "$SCORE_PERFORMANCE*100" | bc -l)"
-printf -v RUN_OUTPUT '%s|  Bundle Size:           %s\t|\n' "$RUN_OUTPUT" "$(echo "$BUNDLE_SIZE" | bc -l)"
+printf -v RUN_OUTPUT '%s|  Bundle Size:           %s\t|\n' "$RUN_OUTPUT" "$(echo "$BUNDLE_SIZE")"
 
 #printf "|  Accessibility:         %.0f\t|\n" "$(echo "$SCORE_ACCESSIBILITY*100" | bc -l)"
 #printf "|  Best Practices:        %.0f\t|\n" "$(echo "$SCORE_PRACTICES*100" | bc -l)"
