@@ -33,7 +33,7 @@ mkdir -p "$OUTPUT_FOLDER"
 printf "* Beginning audit of %s ...\n\n" "$REPORT_URL"
 
 # Run Lighthouse!
-URL="${REPORT_URL}" BASE_URL="${BASE_REPORT_URL}" BASE_REPORT_PATH="${BASE_OUTPUT_PATH}" REPORT_PATH="${OUTPUT_PATH}" NETLIFY_BASE_AUTH="${INPUT_NETLIFY_BASE_PASSWORD}" NETLIFY_AUTH="${INPUT_NETLIFY_PASSWORD}" node /login_lighthouse.js
+URL="${REPORT_URL}" BASE_URL="${BASE_REPORT_URL}" BASE_REPORT_PATH="${BASE_OUTPUT_PATH}" REPORT_PATH="${OUTPUT_PATH}" NETLIFY_BASE_AUTH="${INPUT_NETLIFY_BASE_PASSWORD}" NETLIFY_AUTH="${INPUT_NETLIFY_PASSWORD}" node /lighthouse.js
 
 # Parse individual scores from JSON output.
 # Unorthodox jq syntax because of dashes -- https://github.com/stedolan/jq/issues/38
