@@ -13,6 +13,9 @@ else
   REPORT_URL=$INPUT_URL
 fi
 
+# Prepare directory for audit results and sanitize URL to a valid and unique filename.
+OUTPUT_FOLDER="report"
+
 BASE_REPORT_URL=""
 BASE_OUTPUT_PATH=""
 if [ -n "$INPUT_NETLIFY_SITE" ] && [ -n "$INPUT_NETLIFY_BASE_BRANCH" ]; then
@@ -22,8 +25,6 @@ if [ -n "$INPUT_NETLIFY_SITE" ] && [ -n "$INPUT_NETLIFY_BASE_BRANCH" ]; then
   BASE_OUTPUT_PATH="$GITHUB_WORKSPACE/$OUTPUT_FOLDER/$BASE_OUTPUT_FILENAME"
 fi
 
-# Prepare directory for audit results and sanitize URL to a valid and unique filename.
-OUTPUT_FOLDER="report"
 # shellcheck disable=SC2001
 OUTPUT_FILENAME=$(echo "$REPORT_URL" | sed 's/[^a-zA-Z0-9]/_/g')
 OUTPUT_PATH="$GITHUB_WORKSPACE/$OUTPUT_FOLDER/$OUTPUT_FILENAME"
