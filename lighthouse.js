@@ -31,7 +31,7 @@ async function login(browser, origin, password) {
   await page.close();
 }
 
-async function generate_report_for(browser, url, password) {
+async function generate_report_for(url, browser, password) {
   // Setup the browser session to be logged into our site.
   await login(browser, url, password);
 
