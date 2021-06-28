@@ -39,7 +39,7 @@ async function generate_report_for(browser, url, password) {
   return await lighthouse(url, {onlyCategories: ['performance'], port: PORT, disableStorageReset: true})
 }
 
-function write_report = (json, html, PATH) {
+function write_report(json, html, PATH) {
   fs.writeFileSync(`${path}.report.html`, html);
   fs.writeFileSync(`${path}.report.json`, json.report);
 }
