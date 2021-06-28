@@ -20,6 +20,6 @@ RUN PUPPETEER_SKIP_DOWNLOAD=1 npm install lighthouse puppeteer
 ENV CI=true
 
 ADD entrypoint.sh /entrypoint.sh
-ADD login_lighthouse.js /login_lighthouse.js
+ADD lighthouse.js /lighthouse.js
 
 ENTRYPOINT ["/entrypoint.sh"]

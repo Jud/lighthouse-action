@@ -13,6 +13,15 @@ else
   REPORT_URL=$INPUT_URL
 fi
 
+BASE_REPORT_URL=""
+BASE_OUTPUT_PATH=""
+if [ -n "$INPUT_NETLIFY_SITE" ] && [ -n "$INPUT_NETLIFY_BASE_BRANCH" ]; then
+  BASE_REPORT_URL="https://$INPUT_NETLIFY_BASE_BRANCH--$INPUT_NETLIFY_SITE"
+  # shellcheck disable=SC2001
+  BASE_OUTPUT_FILENAME=$(echo "$BASE_REPORT_URL" | sed 's/[^a-zA-Z0-9]/_/g')
+  BASE_OUTPUT_PATH="$GITHUB_WORKSPACE/$OUTPUT_FOLDER/$BASE_OUTPUT_FILENAME"
+fi
+
 # Prepare directory for audit results and sanitize URL to a valid and unique filename.
 OUTPUT_FOLDER="report"
 # shellcheck disable=SC2001
@@ -24,7 +33,7 @@ mkdir -p "$OUTPUT_FOLDER"
 printf "* Beginning audit of %s ...\n\n" "$REPORT_URL"
 
 # Run Lighthouse!
-URL="${REPORT_URL}" REPORT_PATH="${OUTPUT_PATH}" NETLIFY_AUTH="${INPUT_NETLIFY_PASSWORD}" node /login_lighthouse.js
+URL="${REPORT_URL}" BASE_URL="${BASE_REPORT_URL}" BASE_REPORT_PATH="${BASE_OUTPUT_PATH}" REPORT_PATH="${OUTPUT_PATH}" NETLIFY_BASE_AUTH="${INPUT_NETLIFY_BASE_PASSWORD}" NETLIFY_AUTH="${INPUT_NETLIFY_PASSWORD}" node /login_lighthouse.js
 
 # Parse individual scores from JSON output.
 # Unorthodox jq syntax because of dashes -- https://github.com/stedolan/jq/issues/38
@@ -40,7 +49,13 @@ BUNDLE_SIZE=$(cat "$OUTPUT_PATH".report.json | jq '.audits."network-requests".de
 printf '\n* Completed audit of %s ! Scores are printed below:\n\n' "$REPORT_URL"
 printf -v RUN_OUTPUT '+-------------------------------+\n'
 printf -v RUN_OUTPUT '%s|  Performance:         %.0f\t|\n' "$RUN_OUTPUT" "$(echo "$SCORE_PERFORMANCE*100" | bc -l)"
-printf -v RUN_OUTPUT '%s|  Bundle Size:         %s\t|\n' "$RUN_OUTPUT" "$(echo "$BUNDLE_SIZE")"
+printf -v RUN_OUTPUT '%s|  Branch Bundle Size:  %s\t|\n' "$RUN_OUTPUT" "$(echo "$BUNDLE_SIZE")"
+
+if [ -n "$INPUT_NETLIFY_SITE" ]; then
+  BASE_BUNDLE_SIZE=$(cat "$BASE_OUTPUT_PATH".report.json | jq '.audits."network-requests".details.items[] | select(.url|test("netlify.app/.*js$")) | .resourceSize' | awk '{ SUM += $1} END { print SUM }' | awk '{$1/=1024;printf "%.2fKB\n",$1}' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
+  printf -v RUN_OUTPUT '%s|  Develop Bundle Size:  %s\t|\n' "$RUN_OUTPUT" "$(echo "$BASE_BUNDLE_SIZE")"
+  printf -v RUN_OUTPUT '%s|  Size Difference:  %.2f\t|\n' "$RUN_OUTPUT" "$(echo $(($($BUNDLE_SIZE | sed 's/[^0-9]*//g')-$($BASE_BUNDLE_SIZE | sed 's/[^0-9]*//g'))) | bc -l)"
+fi
 
 #printf "|  Accessibility:         %.0f\t|\n" "$(echo "$SCORE_ACCESSIBILITY*100" | bc -l)"
 #printf "|  Best Practices:        %.0f\t|\n" "$(echo "$SCORE_PRACTICES*100" | bc -l)"
