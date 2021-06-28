@@ -43,7 +43,7 @@ SCORE_ACCESSIBILITY=$(jq '.categories["accessibility"].score' "$OUTPUT_PATH".rep
 SCORE_PRACTICES=$(jq '.categories["best-practices"].score' "$OUTPUT_PATH".report.json)
 SCORE_SEO=$(jq '.categories["seo"].score' "$OUTPUT_PATH".report.json)
 SCORE_PWA=$(jq '.categories["pwa"].score' "$OUTPUT_PATH".report.json)
-BUNDLE_SIZE=$(cat "$OUTPUT_PATH".report.json | jq '.audits."network-requests".details.items[] | select(.url|test("netlify.app/.*js$")) | .resourceSize' | awk '{ SUM += $1} END { print SUM }' | awk '{$1/=1024;printf "%.2fKB\n",$1}' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
+BUNDLE_SIZE=$(cat "$OUTPUT_PATH".report.json | jq ".audits.\"network-requests\".details.items[] | select(.url|test(\"${REPORT_URL}/.*js$\")) | .resourceSize" | awk '{ SUM += $1} END { print SUM }' | awk '{$1/=1024;printf "%.2fKB\n",$1}' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
 
 # Print scores to standard output (0 to 100 instead of 0 to 1).
 # Using hacky bc b/c bash hates floating point arithmetic...
@@ -53,7 +53,7 @@ printf -v RUN_OUTPUT '%s|  Performance:         %.0f\t|\n' "$RUN_OUTPUT" "$(echo
 printf -v RUN_OUTPUT '%s|  Branch Bundle Size:  %s\t|\n' "$RUN_OUTPUT" "$(echo "$BUNDLE_SIZE")"
 
 if [ -n "$INPUT_NETLIFY_BASE_BRANCH" ]; then
-  BASE_BUNDLE_SIZE=$(cat "$BASE_OUTPUT_PATH".report.json | jq '.audits."network-requests".details.items[] | select(.url|test("netlify.app/.*js$")) | .resourceSize' | awk '{ SUM += $1} END { print SUM }' | awk '{$1/=1024;printf "%.2fKB\n",$1}' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
+  BASE_BUNDLE_SIZE=$(cat "$BASE_OUTPUT_PATH".report.json | jq ".audits.\"network-requests\".details.items[] | select(.url|test(\"${BASE_REPORT_URL}/.*js$\")) | .resourceSize" | awk '{ SUM += $1} END { print SUM }' | awk '{$1/=1024;printf "%.2fKB\n",$1}' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
   printf -v RUN_OUTPUT '%s|  Develop Bundle Size: %s\t|\n' "$RUN_OUTPUT" "$(echo "$BASE_BUNDLE_SIZE")"
   printf -v RUN_OUTPUT '%s|  Size Difference:     %.2fMB\t|\n' "$RUN_OUTPUT" "$(echo "$(echo "$BUNDLE_SIZE" | sed 's/[^0-9\.]*//g')-$(echo "$BASE_BUNDLE_SIZE" | sed 's/[^0-9\.]*//g')" | bc)"
 fi
