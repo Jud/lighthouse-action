@@ -51,7 +51,7 @@ printf -v RUN_OUTPUT '+-------------------------------+\n'
 printf -v RUN_OUTPUT '%s|  Performance:         %.0f\t|\n' "$RUN_OUTPUT" "$(echo "$SCORE_PERFORMANCE*100" | bc -l)"
 printf -v RUN_OUTPUT '%s|  Branch Bundle Size:  %s\t|\n' "$RUN_OUTPUT" "$(echo "$BUNDLE_SIZE")"
 
-if [ -n "$INPUT_NETLIFY_SITE" ]; then
+if [ -n "$INPUT_NETLIFY_BASE_BRANCH" ]; then
   BASE_BUNDLE_SIZE=$(cat "$BASE_OUTPUT_PATH".report.json | jq '.audits."network-requests".details.items[] | select(.url|test("netlify.app/.*js$")) | .resourceSize' | awk '{ SUM += $1} END { print SUM }' | awk '{$1/=1024;printf "%.2fKB\n",$1}' | awk '{$1/=1024;printf "%.2fMB\n",$1}')
   printf -v RUN_OUTPUT '%s|  Develop Bundle Size:  %s\t|\n' "$RUN_OUTPUT" "$(echo "$BASE_BUNDLE_SIZE")"
   printf -v RUN_OUTPUT '%s|  Size Difference:  %.2f\t|\n' "$RUN_OUTPUT" "$(echo $(($($BUNDLE_SIZE | sed 's/[^0-9]*//g')-$($BASE_BUNDLE_SIZE | sed 's/[^0-9]*//g'))) | bc -l)"
