@@ -1,7 +1,7 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const lighthouse = require('lighthouse');
-const ReportGenerator = require('lighthouse/lighthouse-core/report/report-generator');
+const ReportGenerator = require('lighthouse/report/report-generator');
 
 // This port will be used by Lighthouse later. The specific port is arbitrary.
 const PORT = 8041;
