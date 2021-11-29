@@ -23,4 +23,4 @@ ENV CI=true
 ADD entrypoint.sh ./entrypoint.sh
 ADD lighthouse.js ./lighthouse.js
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
