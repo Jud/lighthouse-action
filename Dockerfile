@@ -18,6 +18,7 @@ WORKDIR /app
 RUN PUPPETEER_SKIP_DOWNLOAD=1 npm install csp_evaluator@1.0.1 lighthouse puppeteer@11
 
 # Disable Lighthouse error reporting to prevent prompt
+
 ENV CI=true
 
 ADD entrypoint.sh ./entrypoint.sh
